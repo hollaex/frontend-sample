@@ -1,17 +1,33 @@
 import Logo from "@/components/logo";
+import axios from "axios";
 import Link from "next/link";
 
 const Login = () => {
+  // const [userEmail, setUserEmail] = useState()
+  const handleLogin = () => {
+    axios
+      .post("https://api.sandbox.hollaex.com/v2/login", {
+        email: "purab.shah93@gmail.com",
+        password: "Purab@123",
+        captcha:
+          "03AFcWeA6Cg-h6Cwb0vxLg8f7YZkDTbu1sK36N4mY1rzFC7fhHNgbc_zuRNNXVdICEK4N00R80s-gHAO1Hrr1FQNFEXS3RXWy23PCrCf2farZooIKtDkBgetm4UmB1ItKWll4csM5zliRo1ZAF2dzSR-BWIW2aoAnxbN_npH5u8CfSQxnUWvN18E8UX1tAqS4-_vweOzWvzYHqAyC_RU8plH_8szai6Z_Jtvs2LngoTlNYryJpFQvUkhcpyIm3A7-8PDIr9zm3A3FGboGITk40pmlYiEWPXUCltAtEmkl0tOMSfBGlMDXs7VzMBfRzD_DsuBhHNFZ7oOgrhqIpteh0VD4cz_Dtom-VWXX8TTo0bWe9MHc7Bt-nsxE3Ftf8dfiZNU18isa1a0MAyI1udqK34EFEayZq4bpvSPA7WWfJXUj8rq7qNZzPOSiAkgJcaK3KwtUrxT8I7vxwLKSPKafIA_Svda8DB7Baky3IN1N5W0HQwix1DG2GkteqqM_FqTbsj39L27U7jy2cJJd0RofVBdaSsKIAWSmG7OJjIh7QK4Vfv0QBSghmMg-qiaK55ht8kQqo6MrVfXI-siLKxnxNrROHqlZTHIS7gW8-s-aKoTokMdqQev_xIXy7WDtiFi4Mquc9rdQuRNtWNISG-JXGIpW0NREG1qrBxQ",
+      })
+      .then((res) => {
+        console.log("LOGIN OP", res.data.token);
+      })
+      .catch((err) => console.log(err));
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-            <Logo />
+          <Logo />
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Sign in to your account
           </h2>
         </div>
-        <form className="mt-8 space-y-6" action="#" method="POST">
+        <div className="mt-8 space-y-6">
           <input type="hidden" name="remember" value="true" />
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
@@ -74,11 +90,12 @@ const Login = () => {
             <button
               type="submit"
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              onClick={handleLogin}
             >
               Sign in
             </button>
           </div>
-        </form>
+        </div>
 
         <div className="text-sm text-center">
           <p className="font-medium text-gray-900">
