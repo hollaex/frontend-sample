@@ -13,7 +13,6 @@ const BalancePage = () => {
   const updateCoinList = ({ balance }) => {
     const resArr = [];
     let amt = 0;
-
     Object.keys(balance).map((key) => {
       const { native_currency_value, original_value } = balance[key];
       const coinData = constantsData?.coins[key];
@@ -33,7 +32,7 @@ const BalancePage = () => {
 
   useEffect(() => {
     balanceData?.length && updateCoinList(balanceData[0]);
-  }, [balanceData, updateCoinList]);
+  }, [balanceData, constantsData]);
 
   const handleOnChange = (e) => {
     const searchValue = e.target.value.toLowerCase();
@@ -70,8 +69,8 @@ const BalancePage = () => {
                 <tr key={currency.id}>
                   <td className="py-2 px-4 flex">
                     <Image
-                      alt={currency.name}
-                      src={currency.logo}
+                      alt={currency?.name || "Fallback"}
+                      src={currency?.logo || "/fallback.png"}
                       width={25}
                       height={25}
                       className="mr-3"
@@ -80,14 +79,14 @@ const BalancePage = () => {
                   </td>
                   <td className="py-2 px-4">{currency.amount}</td>
                   <td className="py-2 px-4">
-                    <Link
-                      href={`./wallet/${currency.id}/deposit`}
-                      className="text-blue-500 cursor-pointer"
-                    >
-                      <button className="px-3 py-1 mr-2 border border-blue-800 text-blue-800 rounded-md cursor-pointer">
+                    <button className="px-3 py-1 mr-2 border border-blue-800 text-blue-800 rounded-md cursor-pointer">
+                      <Link
+                        href={`./wallet/${currency.id}/deposit`}
+                        className="text-blue-500 cursor-pointer"
+                      >
                         Deposit
-                      </button>
-                    </Link>
+                      </Link>
+                    </button>
                     <button className="px-3 py-1 border border-red-500 text-red-500 rounded-md">
                       Withdraw
                     </button>

@@ -52,7 +52,7 @@ const DepositPage = () => {
 
     balance && setCoinBalance(balance[`${coinId}_available`]);
     balance && setTotalBalance(balance[`${coinId}_balance`]);
-  }, [coinId]);
+  }, []);
 
   const handleHelpClick = () => {
     // Logic to handle Help link click

@@ -26,7 +26,7 @@ const AppBar = ({ hideMenu }) => {
       {!hideMenu && (
         <>
           <div className="flex items-center space-x-6">
-            <Link href="/balance" className="hover:text-gray-400">
+            <Link href="/wallet" className="hover:text-gray-400">
               Wallet
             </Link>
             <Link href="/quicktrade" className="hover:text-gray-400">
