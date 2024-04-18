@@ -33,7 +33,7 @@ const BalancePage = () => {
 
   useEffect(() => {
     balanceData?.length && updateCoinList(balanceData[0]);
-  }, [balanceData]);
+  }, [balanceData, updateCoinList]);
 
   const handleOnChange = (e) => {
     const searchValue = e.target.value.toLowerCase();
