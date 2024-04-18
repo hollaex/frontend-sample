@@ -7,7 +7,7 @@ class AuthService {
   }
 
   async logout() {
-    const data = await api.post('/logout');
+    const data = await api.get('/logout');
     return data;
   }
 }
