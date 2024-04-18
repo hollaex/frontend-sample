@@ -1,5 +1,5 @@
-import Image from "next/image";
 import React from "react";
+import Image from "next/image";
 
 const Logo = ({ height=80, width=80 }) => {
   return (

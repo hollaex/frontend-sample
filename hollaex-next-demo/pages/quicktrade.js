@@ -7,3 +7,5 @@ const QuickTrade = () => {
     </div>
   );
 }
+
+export default QuickTrade;
