@@ -29,7 +29,7 @@ const AppBar = ({ hideMenu }) => {
             <Link href="/wallet" className="hover:text-gray-400">
               Wallet
             </Link>
-            <Link href="/quicktrade" className="hover:text-gray-400">
+            <Link href="/quicktrade/btc-usdt" className="hover:text-gray-400">
               Quick Trade
             </Link>
           </div>
