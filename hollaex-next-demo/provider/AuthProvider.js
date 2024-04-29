@@ -20,7 +20,7 @@ const AuthProvider = ({ children }) => {
     authService.logout();
     localStorage.setItem("hconstants", null);
     setUserToken(null);
-    router.push('./login');
+    router.push('/login');
   };
 
   const getBalance = async () => {

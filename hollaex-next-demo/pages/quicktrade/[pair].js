@@ -114,6 +114,7 @@ const Trade = () => {
 
   const handleConversionCryptoChange = (selectedOption) => {
     setConversionCrypto(selectedOption);
+    setChartData({});
   };
 
   useEffect(() => {
@@ -123,6 +124,16 @@ const Trade = () => {
   useEffect(() => {
     fetchChartData();
   }, [conversionCrypto]);
+
+  useEffect(() => {
+    selectedCrypto?.value &&
+      conversionCrypto?.value &&
+      router.push(
+        `/quicktrade/${selectedCrypto.value}-${conversionCrypto.value}`,
+        undefined,
+        { shallow: true }
+      );
+  }, [selectedCrypto, conversionCrypto]);
 
   useEffect(() => {
     quickTradeData && coins && getCoinOptions();
