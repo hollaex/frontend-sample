@@ -6,17 +6,18 @@ import {
   formatToCurrency,
 } from "./utils";
 
+
 const QuickTradeChart = ({ selectedCrypto, conversionCrypto, chartData }) => {
+
   const coinChartData =
     chartData[`${selectedCrypto.value}-${conversionCrypto.value}`];
-  console.log(selectedCrypto, conversionCrypto, chartData);
 
   const [sevenDayData, setSevenDayData] = useState({});
   const [oneDayData, setOneDayData] = useState({});
   const [coinStats, setCoinStats] = useState({});
   const [oneDayChartData, setOneDayChartData] = useState([]);
   const [sevenDayChartData, setSevenDayChartData] = useState([]);
-  const [showSevenDay, setShowSevenDay] = useState(true);
+  const [showSevenDay, setShowSevenDay] = useState(false);
   const [chartDataToShow, setChartDataToShow] = useState([]);
 
   const getPricingData = (price) => {
@@ -74,7 +75,7 @@ const QuickTradeChart = ({ selectedCrypto, conversionCrypto, chartData }) => {
 
   const handleToggle = () => setShowSevenDay(!showSevenDay);
 
-  useEffect(() => {
+  const handleCoinData = () => {
     if (showSevenDay) {
       setChartDataToShow(sevenDayChartData);
       setCoinStats(sevenDayData);
@@ -82,32 +83,40 @@ const QuickTradeChart = ({ selectedCrypto, conversionCrypto, chartData }) => {
       setChartDataToShow(oneDayChartData);
       setCoinStats(oneDayData);
     }
+  };
+
+  useEffect(() => {
+    handleCoinData();
   }, [showSevenDay]);
 
-  console.log("oneDayChartData", oneDayChartData);
-  console.log("sevenDayChartData", sevenDayChartData);
-  console.log("oneDayData", oneDayData);
-  console.log("sevenDayData", sevenDayData);
+  useEffect(() => {
+    setShowSevenDay(true);
+  },[]);
+
   return (
     <div className="w-1/2 bg-gray-100 p-4">
       <div className="flex flex-col space-y-4">
         <h2 className="text-xl font-bold">
           {selectedCrypto && selectedCrypto?.value?.toUpperCase()}
         </h2>
-        <div className="flex justify-between items-center">
-          <label htmlFor="toggle">View:</label>
-          <div className="relative inline-block w-10 mr-4">
-            <input
-              type="checkbox"
-              id="toggle"
-              name="toggle"
-              checked={showSevenDay}
-              onChange={handleToggle}
-            />
-            <span className="absolute block bg-gray-400 rounded-full w-6 h-6 cursor-pointer"></span>
-            <span className="relative text-left pl-3">
-              {showSevenDay ? "7d" : "1d"}
-            </span>
+        <div className="flex w-full">
+          <div className="flex">
+            <span className="text-gray-700 mr-2">1D</span>
+            <div className="relative inline-block w-10 align-middle select-none transition duration-200 ease-in">
+              <input
+                type="checkbox"
+                id="toggle"
+                name="toggle"
+                className="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"
+                checked={showSevenDay}
+                onChange={handleToggle}
+              />
+              <label
+                htmlFor="toggle"
+                className="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"
+              ></label>
+            </div>
+            <span className="text-gray-700 ml-2">7D</span>
           </div>
         </div>
 

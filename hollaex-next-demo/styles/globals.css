@@ -31,3 +31,17 @@ body {
     text-wrap: balance;
   }
 }
+
+.toggle-checkbox:checked {
+  right: 0;
+}
+.toggle-checkbox:checked + .toggle-label {
+  background-color: #4F46E5;
+}
+
+.toggle-checkbox {
+  border-color: #4F46E5;
+}
+.toggle-label {
+  transition: background-color 0.2s;
+}
