@@ -6,13 +6,19 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 import Select from "react-select";
 import QuickTradeChart from "@/components/quickTradeChart";
+import { re } from "mathjs";
+
+const SPENDING = {
+	SOURCE: 'SOURCE',
+	TARGET: 'TARGET',
+};
 
 const Trade = () => {
   const router = useRouter();
   const pair = router.query.pair;
   const pairCoinFirst = pair?.split("-")[0] || "btc";
   const pairCoinSecond = pair?.split("-")[1] || "usdt";
-  const { constantsData } = useContext(AuthContext);
+  const { constantsData, balanceData } = useContext(AuthContext);
   const coins = constantsData?.coins;
   const quickTradeData = constantsData?.quicktrade;
   const [chartData, setChartData] = useState(null);
@@ -23,6 +29,9 @@ const Trade = () => {
   const [conversionCrypto, setConversionCrypto] = useState(
     conversionCoinOptions[0]
   );
+  const [spendingAmount, setSpendingAmount] = useState(0);
+  const [receivingAmount, setReceivingAmount] = useState(0);
+  const [quickTradeToken, setQuickTradeToken] = useState(null);
 
   useEffect(() => {
     const updatedPair = router.query.pair;
@@ -49,7 +58,7 @@ const Trade = () => {
               alt={coin}
               width={20}
               height={20}
-              className="mr-2"
+              className="mr-1.5"
             />
           )}
           {coin?.toUpperCase()}
@@ -139,9 +148,39 @@ const Trade = () => {
     quickTradeData && coins && getCoinOptions();
   }, [quickTradeData, coins]);
 
+  const getBalance = (cryptoName) => {
+    if (!balanceData || balanceData.length === 0) {
+      return 0;
+    }
+    const latestBalanceData = balanceData[0]?.balance;
+    return latestBalanceData[cryptoName]?.original_value;
+  };
+
+  const handleQuickTrade = async () => {
+    const amountPayload =
+    SPENDING.SOURCE === SPENDING.SOURCE
+    ? {spending_amount: spendingAmount }
+    : { receiving_amount: receivingAmount };
+
+    const values = {
+      ...amountPayload,
+      receiving_currency: conversionCrypto.value,
+      spending_currency: selectedCrypto.value,
+    };
+    const response = await quickTradeService.getQuickTrade(values);
+    console.log(response);
+    setReceivingAmount(response.receiving_amount)
+    setQuickTradeToken(response.token);
+  }
+
+  const handleExecuteTrade = async () => {
+    const response = await quickTradeService.executeTrade(quickTradeToken);
+    console.log(response);
+  }
+
   return (
     <PageLayout>
-      <div className="flex h-[600px] w-full text-black">
+      <div className="flex h-[75vh] w-[75vw] p-16 text-black">
         {chartData && conversionCrypto && (
           <QuickTradeChart
             selectedCrypto={selectedCrypto}
@@ -149,42 +188,70 @@ const Trade = () => {
             chartData={chartData[conversionCrypto?.value]}
           />
         )}
-        <div className="w-1/2 bg-white p-4">
-          {/* Trade section */}
-          <div className="flex flex-col space-y-4">
-            <h2 className="text-xl font-bold">Convert</h2>
-            <div className="flex space-x-4">
-              <Select
-                value={selectedCrypto}
-                onChange={handleSlectedCryptoChange}
-                options={selectCoinOptions}
-              />
-              <input
-                type="number"
-                className="border rounded-md px-2 py-1 focus:outline-none"
-                placeholder="Amount"
-              />
-            </div>
-            <h2 className="text-xl font-bold">To</h2>
-            <div className="flex space-x-4">
-              <Select
-                value={conversionCrypto}
-                onChange={handleConversionCryptoChange}
-                options={conversionCoinOptions}
-              />
-              <input
-                type="number"
-                className="border rounded-md px-2 py-1 focus:outline-none"
-                placeholder="Amount"
-              />
-            </div>
-
-            <button className="bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-700">
-              Quick Review Trade
-            </button>
+        <div className="w-1/2 bg-white p-8 rounded-r-lg">
+          <div className="flex flex-col space-y-4 items-end">
             <a href="/wallet" className="text-blue-500 underline">
               Go to Wallet
             </a>
+            <div className="text-left border rounded-lg p-4">
+              <div className="flex justify-between mb-6">
+                <h2 className="text-xl font-bold">Convert</h2>
+                <div>
+                  {selectedCrypto?.value?.toUpperCase()} Balance:{" "}
+                  <span className="text-blue-500">
+                    {getBalance(selectedCrypto?.value)}
+                  </span>
+                </div>
+              </div>
+              <div className="flex space-x-4">
+                <Select
+                  value={selectedCrypto}
+                  onChange={handleSlectedCryptoChange}
+                  options={selectCoinOptions}
+                  className="w-[125px]"
+                />
+                <input
+                  type="number"
+                  className="border rounded-md px-2 py-1 focus:outline-none w-[200px]"
+                  placeholder="Amount"
+                  onChange={(e) => setSpendingAmount(e.target.value)}
+                  onBlur={handleQuickTrade}
+                  value={spendingAmount}
+                />
+              </div>
+            </div>
+            <div className="text-left border rounded-lg p-4">
+              <div className="flex justify-between mb-6">
+                <h2 className="text-xl font-bold">To</h2>
+                <div>
+                  {selectedCrypto?.value?.toUpperCase()} Balance:{" "}
+                  <span className="text-blue-500">
+                    {getBalance(conversionCrypto?.value)}
+                  </span>
+                </div>
+              </div>
+              <div className="flex space-x-4">
+                <Select
+                  value={conversionCrypto}
+                  onChange={handleConversionCryptoChange}
+                  options={conversionCoinOptions}
+                  className="w-[125px]"
+                />
+                <input
+                  type="number"
+                  className="border rounded-md px-2 py-1 focus:outline-none w-[200px]"
+                  placeholder="Amount"
+                  onChange={(e) => setReceivingAmount(e.target.value)}
+                  onBlur={handleQuickTrade}
+                  value={receivingAmount}
+                />
+              </div>
+            </div>
+            <div>
+              <button className="bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-700 mt-8" onClick={handleExecuteTrade}>
+                Quick Review Trade
+              </button>
+            </div>
           </div>
         </div>
       </div>

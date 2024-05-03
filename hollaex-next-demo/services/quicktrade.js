@@ -1,10 +1,8 @@
 import { api } from "./axios";
-
+import queryString from "query-string";
 class QuickTradeService {
   async getCharts(pairs, quote = "usdt") {
-    const data = await api.get(
-      `/minicharts?assets=${pairs}&quote=${quote}`
-    );
+    const data = await api.get(`/minicharts?assets=${pairs}&quote=${quote}`);
 
     const result = {};
 
@@ -25,6 +23,18 @@ class QuickTradeService {
     });
 
     return result;
+  }
+
+  async getQuickTrade(values) {
+    const data = await api.get(`/quick-trade?${queryString.stringify(values)}`);
+
+    return data;
+  }
+
+  async executeTrade(token) {
+    const data = await api.post("/order/execute", { token });
+
+    return data;
   }
 }
 

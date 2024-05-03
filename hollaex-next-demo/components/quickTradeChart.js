@@ -6,11 +6,9 @@ import {
   formatToCurrency,
 } from "./utils";
 
-
 const QuickTradeChart = ({ selectedCrypto, conversionCrypto, chartData }) => {
-
   const coinChartData =
-    chartData[`${selectedCrypto.value}-${conversionCrypto.value}`];
+  chartData && chartData[`${selectedCrypto.value}-${conversionCrypto.value}`];
 
   const [sevenDayData, setSevenDayData] = useState({});
   const [oneDayData, setOneDayData] = useState({});
@@ -59,12 +57,13 @@ const QuickTradeChart = ({ selectedCrypto, conversionCrypto, chartData }) => {
     const handleDataUpdate = () => {
       const { price, time } = coinChartData;
       if (price && time) {
+        console.log(price)
         const indexOneDay = getIndexofOneDay(time);
         const oneDayChartPrices = price.slice(indexOneDay, price.length);
-        setOneDayChartData(getLastValuesFromParts(oneDayChartPrices));
-        setOneDayData(getPricingData(oneDayChartPrices));
         setSevenDayChartData(getLastValuesFromParts(price));
         setSevenDayData(getPricingData(price));
+        setOneDayChartData(getLastValuesFromParts(oneDayChartPrices));
+        setOneDayData(getPricingData(oneDayChartPrices));
       }
     };
 
@@ -91,15 +90,15 @@ const QuickTradeChart = ({ selectedCrypto, conversionCrypto, chartData }) => {
 
   useEffect(() => {
     setShowSevenDay(true);
-  },[]);
+  }, []);
 
   return (
-    <div className="w-1/2 bg-gray-100 p-4">
+    <div className="w-1/2 bg-gray-100 p-8 rounded-l-lg">
       <div className="flex flex-col space-y-4">
-        <h2 className="text-xl font-bold">
-          {selectedCrypto && selectedCrypto?.value?.toUpperCase()}
-        </h2>
-        <div className="flex w-full">
+        <div className="flex w-full justify-between mb-8">
+          <h2 className="text-xl font-bold">
+            {selectedCrypto && selectedCrypto?.value?.toUpperCase()}
+          </h2>
           <div className="flex">
             <span className="text-gray-700 mr-2">1D</span>
             <div className="relative inline-block w-10 align-middle select-none transition duration-200 ease-in">
@@ -131,7 +130,7 @@ const QuickTradeChart = ({ selectedCrypto, conversionCrypto, chartData }) => {
           </div>
         </div>
         {chartData && (
-          <div className="h-[300px] w-[400px]">
+          <div className="h-[200px] w-[350px]">
             <TradeChart
               chartData={
                 chartData[`${selectedCrypto.value}-${conversionCrypto.value}`]
