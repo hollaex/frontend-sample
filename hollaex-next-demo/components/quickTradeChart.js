@@ -8,7 +8,7 @@ import {
 
 const QuickTradeChart = ({ selectedCrypto, conversionCrypto, chartData }) => {
   const coinChartData =
-  chartData && chartData[`${selectedCrypto.value}-${conversionCrypto.value}`];
+    chartData && chartData[`${selectedCrypto.value}-${conversionCrypto.value}`];
 
   const [sevenDayData, setSevenDayData] = useState({});
   const [oneDayData, setOneDayData] = useState({});
@@ -57,7 +57,6 @@ const QuickTradeChart = ({ selectedCrypto, conversionCrypto, chartData }) => {
     const handleDataUpdate = () => {
       const { price, time } = coinChartData;
       if (price && time) {
-        console.log(price)
         const indexOneDay = getIndexofOneDay(time);
         const oneDayChartPrices = price.slice(indexOneDay, price.length);
         setSevenDayChartData(getLastValuesFromParts(price));
@@ -68,8 +67,6 @@ const QuickTradeChart = ({ selectedCrypto, conversionCrypto, chartData }) => {
     };
 
     handleDataUpdate();
-    //  TODO: Fix react-hooks/exhaustive-deps
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coinChartData, selectedCrypto, conversionCrypto]);
 
   const handleToggle = () => setShowSevenDay(!showSevenDay);

@@ -6,11 +6,12 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 import Select from "react-select";
 import QuickTradeChart from "@/components/quickTradeChart";
+import ReviewModal from "@/components/reviewModal";
 import { re } from "mathjs";
 
 const SPENDING = {
-	SOURCE: 'SOURCE',
-	TARGET: 'TARGET',
+  SOURCE: "SOURCE",
+  TARGET: "TARGET",
 };
 
 const Trade = () => {
@@ -32,6 +33,8 @@ const Trade = () => {
   const [spendingAmount, setSpendingAmount] = useState(0);
   const [receivingAmount, setReceivingAmount] = useState(0);
   const [quickTradeToken, setQuickTradeToken] = useState(null);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [expiryTime, setExpiryTime] = useState(null);
 
   useEffect(() => {
     const updatedPair = router.query.pair;
@@ -68,23 +71,25 @@ const Trade = () => {
   };
 
   const updateConversionCoinList = () => {
-    const conversionSymbolParts = quickTradeData.filter((obj) =>
-      obj.symbol.includes(selectedCrypto.value)
-    );
-    const filteredConversionSymbolParts = conversionSymbolParts.flatMap((obj) =>
-      obj.symbol.split("-")
-    );
+    if (selectedCrypto?.value) {
+      const conversionSymbolParts = quickTradeData.filter((obj) =>
+        obj.symbol.includes(selectedCrypto.value)
+      );
+      const filteredConversionSymbolParts = conversionSymbolParts.flatMap(
+        (obj) => obj.symbol.split("-")
+      );
 
-    const conversionUniqueValues = new Set(filteredConversionSymbolParts);
-    const updatedConversionValues = Array.from(conversionUniqueValues).filter(
-      (item) => item !== selectedCrypto.value
-    );
-    const conversionOptions = getOptionsDom(updatedConversionValues);
+      const conversionUniqueValues = new Set(filteredConversionSymbolParts);
+      const updatedConversionValues = Array.from(conversionUniqueValues).filter(
+        (item) => item !== selectedCrypto.value
+      );
+      const conversionOptions = getOptionsDom(updatedConversionValues);
 
-    setConversionCoinOptions(conversionOptions);
-    setConversionCrypto(
-      conversionOptions.find((coin) => coin.value === pairCoinSecond)
-    );
+      setConversionCoinOptions(conversionOptions);
+      setConversionCrypto(
+        conversionOptions.find((coin) => coin.value === pairCoinSecond)
+      );
+    }
   };
 
   const getCoinOptions = () => {
@@ -158,9 +163,9 @@ const Trade = () => {
 
   const handleQuickTrade = async () => {
     const amountPayload =
-    SPENDING.SOURCE === SPENDING.SOURCE
-    ? {spending_amount: spendingAmount }
-    : { receiving_amount: receivingAmount };
+      SPENDING.SOURCE === SPENDING.SOURCE
+        ? { spending_amount: spendingAmount }
+        : { receiving_amount: receivingAmount };
 
     const values = {
       ...amountPayload,
@@ -169,13 +174,33 @@ const Trade = () => {
     };
     const response = await quickTradeService.getQuickTrade(values);
     console.log(response);
-    setReceivingAmount(response.receiving_amount)
+    setReceivingAmount(response.receiving_amount);
     setQuickTradeToken(response.token);
-  }
+    setExpiryTime(response.expiry);
+  };
 
   const handleExecuteTrade = async () => {
     const response = await quickTradeService.executeTrade(quickTradeToken);
     console.log(response);
+  };
+
+  const getRemainingSeconds = (targetDateTime) => {
+    // Parse the target date and time string
+    const targetDate = new Date(targetDateTime);
+  
+    // Get the current time in milliseconds
+    const currentTime = Date.now();
+  
+    // Calculate the difference in milliseconds
+    const timeDifference = targetDate - currentTime;
+  
+    // Ensure the difference is positive (future time)
+    if (timeDifference <= 0) {
+      return 0;
+    }
+  
+    // Convert the difference to seconds and return the value
+    return Math.floor(timeDifference / 1000);
   }
 
   return (
@@ -248,10 +273,26 @@ const Trade = () => {
               </div>
             </div>
             <div>
-              <button className="bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-700 mt-8" onClick={handleExecuteTrade}>
+              <button
+                className="bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-700 mt-8"
+                onClick={() => setShowReviewModal(true)}
+              >
                 Quick Review Trade
               </button>
             </div>
+            {selectedCrypto && conversionCrypto && (
+              <ReviewModal
+                isOpen={showReviewModal}
+                onClose={setShowReviewModal}
+                onConfirm={handleExecuteTrade}
+                duration={getRemainingSeconds(expiryTime)}
+                spendAmount={spendingAmount}
+                estimatedAmount={receivingAmount}
+                spendCurrency={selectedCrypto}
+                receiveCurrency={conversionCrypto}
+                coinData={constantsData?.coins}
+              />
+            )}
           </div>
         </div>
       </div>
