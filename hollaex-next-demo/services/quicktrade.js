@@ -1,5 +1,7 @@
 import { api } from "./axios";
 import queryString from "query-string";
+import { enqueueSnackbar } from "notistack";
+
 class QuickTradeService {
   async getCharts(pairs, quote = "usdt") {
     const data = await api.get(`/minicharts?assets=${pairs}&quote=${quote}`);
@@ -26,9 +28,29 @@ class QuickTradeService {
   }
 
   async getQuickTrade(values) {
-    const data = await api.get(`/quick-trade?${queryString.stringify(values)}`);
-
-    return data;
+    try {
+      const data = await api.get(
+        `/quick-trade?${queryString.stringify(values)}`
+      );
+      return data;
+    } catch (error) {
+      if (error.response) {
+        const statusCode = error.response.status;
+        if (statusCode === 400) {
+          enqueueSnackbar(error.response.data.message, {
+            variant: "error",
+          });
+        } else {
+          enqueueSnackbar("API request failed. Please try again later.", {
+            variant: "error",
+          });
+        }
+      } else {
+        enqueueSnackbar("An unexpected error occurred.", {
+          variant: "error",
+        });
+      }
+    }
   }
 
   async executeTrade(token) {

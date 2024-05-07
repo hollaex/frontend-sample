@@ -8,6 +8,7 @@ import Select from "react-select";
 import QuickTradeChart from "@/components/quickTradeChart";
 import ReviewModal from "@/components/reviewModal";
 import { re } from "mathjs";
+import { enqueueSnackbar } from "notistack";
 
 const SPENDING = {
   SOURCE: "SOURCE",
@@ -35,6 +36,7 @@ const Trade = () => {
   const [quickTradeToken, setQuickTradeToken] = useState(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [expiryTime, setExpiryTime] = useState(null);
+  const [isReceivingAmount, setIsReceivingAmount] = useState(false);
 
   useEffect(() => {
     const updatedPair = router.query.pair;
@@ -162,10 +164,9 @@ const Trade = () => {
   };
 
   const handleQuickTrade = async () => {
-    const amountPayload =
-      SPENDING.SOURCE === SPENDING.SOURCE
-        ? { spending_amount: spendingAmount }
-        : { receiving_amount: receivingAmount };
+    const amountPayload = isReceivingAmount
+      ? { receiving_amount: receivingAmount }
+      : { spending_amount: spendingAmount };
 
     const values = {
       ...amountPayload,
@@ -174,34 +175,33 @@ const Trade = () => {
     };
     const response = await quickTradeService.getQuickTrade(values);
     console.log(response);
+    if(response) {
     setReceivingAmount(response.receiving_amount);
+    setSpendingAmount(response.spending_amount);
     setQuickTradeToken(response.token);
     setExpiryTime(response.expiry);
+    }
   };
 
   const handleExecuteTrade = async () => {
     const response = await quickTradeService.executeTrade(quickTradeToken);
-    console.log(response);
+    enqueueSnackbar("Trade executed successfully!", {
+      variant: "success",
+    });
   };
 
   const getRemainingSeconds = (targetDateTime) => {
-    // Parse the target date and time string
     const targetDate = new Date(targetDateTime);
-  
-    // Get the current time in milliseconds
+
     const currentTime = Date.now();
-  
-    // Calculate the difference in milliseconds
     const timeDifference = targetDate - currentTime;
-  
-    // Ensure the difference is positive (future time)
+
     if (timeDifference <= 0) {
       return 0;
     }
-  
-    // Convert the difference to seconds and return the value
+
     return Math.floor(timeDifference / 1000);
-  }
+  };
 
   return (
     <PageLayout>
@@ -239,7 +239,10 @@ const Trade = () => {
                   type="number"
                   className="border rounded-md px-2 py-1 focus:outline-none w-[200px]"
                   placeholder="Amount"
-                  onChange={(e) => setSpendingAmount(e.target.value)}
+                  onChange={(e) => {
+                    setIsReceivingAmount(false);
+                    setSpendingAmount(e.target.value);
+                  }}
                   onBlur={handleQuickTrade}
                   value={spendingAmount}
                 />
@@ -249,7 +252,7 @@ const Trade = () => {
               <div className="flex justify-between mb-6">
                 <h2 className="text-xl font-bold">To</h2>
                 <div>
-                  {selectedCrypto?.value?.toUpperCase()} Balance:{" "}
+                  {conversionCrypto?.value?.toUpperCase()} Balance:{" "}
                   <span className="text-blue-500">
                     {getBalance(conversionCrypto?.value)}
                   </span>
@@ -266,7 +269,10 @@ const Trade = () => {
                   type="number"
                   className="border rounded-md px-2 py-1 focus:outline-none w-[200px]"
                   placeholder="Amount"
-                  onChange={(e) => setReceivingAmount(e.target.value)}
+                  onChange={(e) => {
+                    setIsReceivingAmount(true);
+                    setReceivingAmount(e.target.value);
+                  }}
                   onBlur={handleQuickTrade}
                   value={receivingAmount}
                 />

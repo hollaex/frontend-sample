@@ -51,6 +51,7 @@ const ReviewModal = ({
   useEffect(() => {
     setIsExpired(duration <= 0);
   }, [duration]);
+
   const content = (
     <Content isExpired={isExpired}>
       <DialogTitle className="p-0 text-[28px]">Confirm</DialogTitle>
@@ -113,8 +114,6 @@ const ReviewModal = ({
       </DialogContentText>
     </Content>
   );
-
-  console.log("duration", duration);
 
   return (
     <ModalWrapper open={isOpen} onClose={handleCloseModal}>

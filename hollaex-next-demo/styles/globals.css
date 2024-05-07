@@ -45,3 +45,7 @@ body {
 .toggle-label {
   transition: background-color 0.2s;
 }
+
+.MuiTableRow-root .MuiTableCell-root {
+  padding: 0.5rem;
+}

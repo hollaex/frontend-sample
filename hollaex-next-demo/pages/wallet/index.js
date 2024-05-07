@@ -3,6 +3,17 @@ import Link from "next/link";
 import PageLayout from "@/components/pagelayout";
 import Image from "next/image";
 import { AuthContext } from "@/provider/AuthProvider";
+import {
+  Table,
+  TableCell,
+  TableHead,
+  TableRow,
+  Box,
+  Button,
+  TableBody,
+  TableContainer,
+} from "@mui/material";
+import { NorthWest, SouthEast } from "@mui/icons-material";
 
 const BalancePage = () => {
   const { constantsData, balanceData } = useContext(AuthContext);
@@ -45,7 +56,7 @@ const BalancePage = () => {
 
   return (
     <PageLayout>
-      <div className="flex justify-center h-screen w-[80vw] text-black bg-gray-50">
+      <div className="flex justify-center h-[90vh] w-[80vw] text-black bg-gray-50">
         <div className="w-full p-8 bg-white rounded shadow-lg">
           <h1 className="text-3xl font-bold mb-6">
             Total Balance: {totalBalance.toFixed(2)} USDT
@@ -56,45 +67,64 @@ const BalancePage = () => {
             placeholder="Search currencies..."
             onChange={handleOnChange}
           />
-          <table className="w-full border border-gray-300 rounded-md">
-            <thead>
-              <tr>
-                <th className="py-2 px-4 bg-gray-100 text-left">Currency</th>
-                <th className="py-2 px-4 bg-gray-100 text-left">Amount</th>
-                <th className="py-2 px-4 bg-gray-100 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredCoins.map((currency) => (
-                <tr key={currency.id}>
-                  <td className="py-2 px-4 flex">
-                    <Image
-                      alt={currency?.name || "Fallback"}
-                      src={currency?.logo || "/fallback.png"}
-                      width={25}
-                      height={25}
-                      className="mr-3"
-                    />
-                    {currency.name}
-                  </td>
-                  <td className="py-2 px-4">{currency.amount}</td>
-                  <td className="py-2 px-4">
-                    <button className="px-3 py-1 mr-2 border border-blue-800 text-blue-800 rounded-md cursor-pointer">
-                      <Link
-                        href={`./wallet/${currency.id}/deposit`}
-                        className="text-blue-500 cursor-pointer"
+          <TableContainer sx={{ maxHeight: "70vh", overflowY: "auto" }} className="border rounded-lg">
+            <Table stickyHeader className="w-full border border-gray-300 rounded-lg">
+              <TableHead className="rounded-lg">
+                <TableRow>
+                  <TableCell className="bg-gray-100 text-left font-semibold">
+                    Currency
+                  </TableCell>
+                  <TableCell className="bg-gray-100 text-left font-semibold">
+                    Amount
+                  </TableCell>
+                  <TableCell className="bg-gray-100 text-left font-semibold">
+                    Actions
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {
+                  filteredCoins.map((currency) => (
+                  <TableRow key={currency.id}>
+                    <TableCell className="">
+                      <Box className="flex items-center">
+                        <Image
+                          alt={currency?.name || "Fallback"}
+                          src={currency?.logo || "/fallback.png"}
+                          width={25}
+                          height={25}
+                          className="mr-3 -mt-1"
+                        />
+                        {currency.name}
+                      </Box>
+                    </TableCell>
+                    <TableCell className="px-4">{currency.amount}</TableCell>
+                    <TableCell className="justify-between">
+                      <Button
+                        variant="outlined"
+                        className="mr-4 border border-blue-800 text-blue-800 rounded-md"
+                        startIcon={<SouthEast />}
                       >
-                        Deposit
-                      </Link>
-                    </button>
-                    <button className="px-3 py-1 border border-red-500 text-red-500 rounded-md">
-                      Withdraw
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                        <Link
+                          href={`./wallet/${currency.id}/deposit`}
+                          className="text-blue-500 cursor-pointer"
+                        >
+                          Deposit
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        className="mr-2 border border-green-800 text-green-800 rounded-md"
+                        startIcon={<NorthWest />}
+                      >
+                        Withdraw
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </div>
       </div>
     </PageLayout>
