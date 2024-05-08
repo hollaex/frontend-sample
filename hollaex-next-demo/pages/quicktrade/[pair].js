@@ -9,6 +9,8 @@ import QuickTradeChart from "@/components/quickTradeChart";
 import ReviewModal from "@/components/reviewModal";
 import { re } from "mathjs";
 import { enqueueSnackbar } from "notistack";
+import { Box, Button } from "@mui/material";
+import { Refresh } from "@mui/icons-material";
 
 const SPENDING = {
   SOURCE: "SOURCE",
@@ -37,6 +39,7 @@ const Trade = () => {
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [expiryTime, setExpiryTime] = useState(null);
   const [isReceivingAmount, setIsReceivingAmount] = useState(false);
+  const [showRequote, setShowRequote] = useState(false);
 
   useEffect(() => {
     const updatedPair = router.query.pair;
@@ -56,7 +59,7 @@ const Trade = () => {
     return coinList.map((coin) => ({
       value: coin,
       label: (
-        <div className="flex">
+        <Box className="flex">
           {coins[coin]?.logo && (
             <Image
               src={coins[coin]?.logo}
@@ -67,7 +70,7 @@ const Trade = () => {
             />
           )}
           {coin?.toUpperCase()}
-        </div>
+        </Box>
       ),
     }));
   };
@@ -174,12 +177,12 @@ const Trade = () => {
       spending_currency: selectedCrypto.value,
     };
     const response = await quickTradeService.getQuickTrade(values);
-    console.log(response);
-    if(response) {
-    setReceivingAmount(response.receiving_amount);
-    setSpendingAmount(response.spending_amount);
-    setQuickTradeToken(response.token);
-    setExpiryTime(response.expiry);
+
+    if (response) {
+      setReceivingAmount(response.receiving_amount);
+      setSpendingAmount(response.spending_amount);
+      setQuickTradeToken(response.token);
+      setExpiryTime(response.expiry);
     }
   };
 
@@ -203,9 +206,20 @@ const Trade = () => {
     return Math.floor(timeDifference / 1000);
   };
 
+  const handleRequote = async () => {
+    setShowRequote(false);
+    await handleQuickTrade();
+  };
+
+  useEffect(() => {
+    if (expiryTime && getRemainingSeconds(expiryTime) <= 0) {
+      setShowRequote(true);
+    }
+  }, [expiryTime]);
+
   return (
     <PageLayout>
-      <div className="flex h-[75vh] w-[75vw] p-16 text-black">
+      <Box className="flex h-[75vh] w-[75vw] p-16 text-black">
         {chartData && conversionCrypto && (
           <QuickTradeChart
             selectedCrypto={selectedCrypto}
@@ -213,22 +227,22 @@ const Trade = () => {
             chartData={chartData[conversionCrypto?.value]}
           />
         )}
-        <div className="w-1/2 bg-white p-8 rounded-r-lg">
-          <div className="flex flex-col space-y-4 items-end">
+        <Box className="w-1/2 bg-white p-8 rounded-r-lg">
+          <Box className="flex flex-col space-y-4 items-end">
             <a href="/wallet" className="text-blue-500 underline">
               Go to Wallet
             </a>
-            <div className="text-left border rounded-lg p-4">
-              <div className="flex justify-between mb-6">
+            <Box className="text-left border rounded-lg p-4">
+              <Box className="flex justify-between mb-6">
                 <h2 className="text-xl font-bold">Convert</h2>
-                <div>
+                <Box>
                   {selectedCrypto?.value?.toUpperCase()} Balance:{" "}
                   <span className="text-blue-500">
                     {getBalance(selectedCrypto?.value)}
                   </span>
-                </div>
-              </div>
-              <div className="flex space-x-4">
+                </Box>
+              </Box>
+              <Box className="flex space-x-4">
                 <Select
                   value={selectedCrypto}
                   onChange={handleSlectedCryptoChange}
@@ -246,19 +260,19 @@ const Trade = () => {
                   onBlur={handleQuickTrade}
                   value={spendingAmount}
                 />
-              </div>
-            </div>
-            <div className="text-left border rounded-lg p-4">
-              <div className="flex justify-between mb-6">
+              </Box>
+            </Box>
+            <Box className="text-left border rounded-lg p-4">
+              <Box className="flex justify-between mb-6">
                 <h2 className="text-xl font-bold">To</h2>
-                <div>
+                <Box>
                   {conversionCrypto?.value?.toUpperCase()} Balance:{" "}
                   <span className="text-blue-500">
                     {getBalance(conversionCrypto?.value)}
                   </span>
-                </div>
-              </div>
-              <div className="flex space-x-4">
+                </Box>
+              </Box>
+              <Box className="flex space-x-4">
                 <Select
                   value={conversionCrypto}
                   onChange={handleConversionCryptoChange}
@@ -276,16 +290,30 @@ const Trade = () => {
                   onBlur={handleQuickTrade}
                   value={receivingAmount}
                 />
-              </div>
-            </div>
-            <div>
-              <button
-                className="bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-700 mt-8"
-                onClick={() => setShowReviewModal(true)}
-              >
-                Quick Review Trade
-              </button>
-            </div>
+              </Box>
+            </Box>
+            <Box>
+              {showRequote && (
+                <Box className="text-right">
+                  <Button
+                    className="bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-700 mt-8"
+                    onClick={handleRequote}
+                    startIcon={<Refresh />}
+                  >
+                    Requote
+                  </Button>
+                </Box>
+              )}
+              <Box>
+                <Button
+                  className="disabled:bg-gray-200 bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-700 mt-8"
+                  onClick={() => setShowReviewModal(true)}
+                  disabled={showRequote}
+                >
+                  Quick Review Trade
+                </Button>
+              </Box>
+            </Box>
             {selectedCrypto && conversionCrypto && (
               <ReviewModal
                 isOpen={showReviewModal}
@@ -299,9 +327,9 @@ const Trade = () => {
                 coinData={constantsData?.coins}
               />
             )}
-          </div>
-        </div>
-      </div>
+          </Box>
+        </Box>
+      </Box>
     </PageLayout>
   );
 };

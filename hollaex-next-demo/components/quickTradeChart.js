@@ -90,7 +90,7 @@ const QuickTradeChart = ({ selectedCrypto, conversionCrypto, chartData }) => {
   }, []);
 
   return (
-    <div className="w-1/2 bg-gray-100 p-8 rounded-l-lg">
+    <div className="w-1/2 bg-[#e9ecef] p-8 rounded-l-lg">
       <div className="flex flex-col space-y-4">
         <div className="flex w-full justify-between mb-8">
           <h2 className="text-xl font-bold">

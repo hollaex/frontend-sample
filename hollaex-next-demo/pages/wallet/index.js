@@ -99,10 +99,11 @@ const BalancePage = () => {
                       </Box>
                     </TableCell>
                     <TableCell className="px-4">{currency.amount}</TableCell>
-                    <TableCell className="justify-between">
+                    <TableCell className="flex w-full">
+                      <Box className="mr-4">
                       <Button
                         variant="outlined"
-                        className="mr-4 border border-blue-800 text-blue-800 rounded-md"
+                        className="border border-blue-800 text-blue-800 rounded-md"
                         startIcon={<SouthEast />}
                       >
                         <Link
@@ -112,13 +113,16 @@ const BalancePage = () => {
                           Deposit
                         </Link>
                       </Button>
+                      </Box>
+                      <Box>
                       <Button
                         variant="outlined"
-                        className="mr-2 border border-green-800 text-green-800 rounded-md"
+                        className="border border-green-800 text-green-800 rounded-md"
                         startIcon={<NorthWest />}
                       >
                         Withdraw
                       </Button>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ))}
