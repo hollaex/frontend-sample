@@ -181,6 +181,7 @@ const Trade = () => {
     const response = await quickTradeService.getQuickTrade(values);
 
     if (response) {
+      setShowRequote(false);
       setReceivingAmount(response.receiving_amount);
       setSpendingAmount(response.spending_amount);
       setQuickTradeToken(response.token);
