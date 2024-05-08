@@ -80,10 +80,10 @@ const ReviewModal = ({
               <AccessTime />
             </Box>
             <Box className="ml-2">
-              Price quote will expire in {duration} seconds
+              Price quote will expire in {Number(duration)/1000} seconds
             </Box>
           </Box>
-          <TimerProgressBar duration={duration} onExpire={handleExpire} />
+          <TimerProgressBar duration={duration} />
         </Box>
       )}
       <DialogContentText className="mt-4">

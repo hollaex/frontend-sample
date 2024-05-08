@@ -40,6 +40,8 @@ const Trade = () => {
   const [expiryTime, setExpiryTime] = useState(null);
   const [isReceivingAmount, setIsReceivingAmount] = useState(false);
   const [showRequote, setShowRequote] = useState(false);
+  const [duration, setDuration] = useState(null);
+  const [firstTime, setFirstTime] = useState(true);
 
   useEffect(() => {
     const updatedPair = router.query.pair;
@@ -212,10 +214,31 @@ const Trade = () => {
   };
 
   useEffect(() => {
-    if (expiryTime && getRemainingSeconds(expiryTime) <= 0) {
-      setShowRequote(true);
+    if (expiryTime) {
+      const remainingSeconds = getRemainingSeconds(expiryTime);
+      setFirstTime(false);
+      setDuration(remainingSeconds * 1000);
     }
   }, [expiryTime]);
+
+  useEffect(() => {
+    if(firstTime) return;
+    if (duration <= 0) {
+      setShowRequote(true);
+    }
+
+    const timerId = setInterval(() => {
+      setDuration((prevDuration) => {
+        if (prevDuration <= 0) {
+          clearInterval(timerId);
+          return 0;
+        }
+        return prevDuration - 1000;
+      });
+    }, 1000);
+
+    return () => clearInterval(timerId);
+  }, [duration]);
 
   return (
     <PageLayout>
@@ -293,7 +316,7 @@ const Trade = () => {
               </Box>
             </Box>
             <Box>
-              {showRequote && (
+              {!firstTime && showRequote && (
                 <Box className="text-right">
                   <Button
                     className="bg-blue-500 text-white rounded-md px-4 py-2 hover:bg-blue-700 mt-8"
@@ -319,7 +342,7 @@ const Trade = () => {
                 isOpen={showReviewModal}
                 onClose={setShowReviewModal}
                 onConfirm={handleExecuteTrade}
-                duration={getRemainingSeconds(expiryTime)}
+                duration={duration}
                 spendAmount={spendingAmount}
                 estimatedAmount={receivingAmount}
                 spendCurrency={selectedCrypto}
