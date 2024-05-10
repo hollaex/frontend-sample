@@ -1,0 +1,521 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "HollaEx API",
+    "description": "API for handling crypto platform functionalities.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.sandbox.hollaex.com/v2",
+      "description": "Development server"
+    }
+  ],
+  "paths": {
+    "/login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Logs the user into the application.",
+        "description": "This endpoint will handle user login by checking the provided credentials.",
+        "operationId": "loginUser",
+        "requestBody": {
+          "description": "User login credentials",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/login_body"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Login Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_401"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/logout": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Logs the user out of the application.",
+        "description": "This endpoint will handle user logout by terminating the session.",
+        "operationId": "logoutUser",
+        "responses": {
+          "200": {
+            "description": "Logout successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_1"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_500"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/balance-history": {
+      "get": {
+        "tags": [
+          "Balance"
+        ],
+        "summary": "Get user balance history",
+        "description": "Fetches balance history for a specified date range.",
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "description": "Start date for balance history",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "description": "End date for balance history",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/inline_response_200_2"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid date range"
+          }
+        }
+      }
+    },
+    "/constants": {
+      "get": {
+        "tags": [
+          "Balance"
+        ],
+        "summary": "Get system constants",
+        "description": "Retrieves various system constants used within the platform.",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_3"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/user/create-address": {
+      "get": {
+        "tags": [
+          "Balance"
+        ],
+        "summary": "Create deposit address",
+        "description": "Generates a new deposit address for a specific cryptocurrency and network.",
+        "parameters": [
+          {
+            "name": "crypto",
+            "in": "query",
+            "description": "The cryptocurrency for which to generate the address",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "network",
+            "in": "query",
+            "description": "The network on which the address should be valid",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_4"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/minicharts": {
+      "get": {
+        "summary": "Get mini chart data for specified trading pairs",
+        "description": "Fetches price and time data for a given set of trading pairs.",
+        "parameters": [
+          {
+            "name": "assets",
+            "in": "query",
+            "description": "Trading pairs to fetch data for",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "quote",
+            "in": "query",
+            "description": "The quote currency to be used",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "default": "usdt"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful retrieval of chart data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/inline_response_map200"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/quick-trade": {
+      "get": {
+        "summary": "Perform a quick trade",
+        "description": "Fetches information for executing a quick trade based on given parameters.",
+        "parameters": [
+          {
+            "name": "values",
+            "in": "query",
+            "description": "Values for constructing the quick trade query",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Quick trade data fetched successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - parameters are invalid"
+          },
+          "default": {
+            "description": "Unexpected error occurred"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/order/execute": {
+      "post": {
+        "summary": "Execute a trade",
+        "description": "Executes a trade based on a provided token.",
+        "requestBody": {
+          "description": "Request payload containing the token for trade execution",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/order_execute_body"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Trade executed successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error in trade execution"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/user": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Get User Data",
+        "description": "Fetches data of the current user.",
+        "operationId": "getUserData",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/inline_response_200_5"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "order_execute_body": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Token related to the trade to be executed"
+          }
+        }
+      },
+      "inline_response_200_5": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "login_body": {
+        "required": [
+          "email",
+          "password"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "user@example.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "yourpassword"
+          }
+        }
+      },
+      "inline_response_200_1": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Logout successful"
+          }
+        }
+      },
+      "inline_response_200": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Login successful"
+          }
+        }
+      },
+      "inline_response_200_2": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date"
+          },
+          "balance": {
+            "type": "number"
+          }
+        }
+      },
+      "inline_response_200_3": {
+        "type": "object",
+        "properties": {
+          "constant_name": {
+            "type": "string"
+          },
+          "constant_value": {
+            "type": "string"
+          }
+        }
+      },
+      "inline_response_200_4": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          }
+        }
+      },
+      "inline_response_map200": {
+        "type": "object",
+        "properties": {
+          "price": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "time": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "inline_response_401": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Invalid credentials"
+          }
+        }
+      },
+      "inline_response_500": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Failed to logout"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
