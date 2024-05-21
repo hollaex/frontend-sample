@@ -8,7 +8,9 @@ To run the project, follow these steps:
 
 1. Install the required dependencies by running `npm install`.
 2. Set up the necessary environment variables by creating a `.env` file and filling in the required values. (Since this a demo there are no env variables)
-3. Start the application by running `npm start`.
+3. For dev mode use command `npm run dev`
+4. For prod mode create the application build by running `npm run build`
+5. Start the application by running `npm start` it will run in prod mode.
 
 ## Hosted FE Demo
 
@@ -19,7 +21,9 @@ To run the project, follow these steps:
 
 ## API Documentation
 
-[Swagger API Demo](https://app.swaggerhub.com/apis-docs/PurabShah/hollaex-api/1.0.0)
+- Base URL for [Sandbox](https://api.sandbox.hollaex.com/v2)
+- Base URL for [Prod](https://api.hollaex.com/v2) 
+- [Swagger API Demo](https://api.sandbox.hollaex.com/api/explorer/)
 
 ## Folder Structure
 
